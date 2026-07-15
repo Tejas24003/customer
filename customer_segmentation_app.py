@@ -19,12 +19,12 @@ st.sidebar.header("Step 1: Customer Data Add Karo")
 
 with st.sidebar.form("add_customer_form", clear_on_submit=True):
     age = st.number_input("Age", min_value=1, max_value=100, value=30)
-    income = st.number_input("Annual Income (in thousands)", min_value=0, value=50)
+    income = st.number_input("Money_Spent (in thousands)", min_value=0, value=50)
     spending = st.number_input("Spending Hours (per week)", min_value=0, value=5)
     submitted = st.form_submit_button("➕ Add Customer")
     if submitted:
         st.session_state.customers.append(
-            {"Age": age, "Annual_income": income, "spending_hours": spending}
+            {"Age": age, "Money_Spent ": income, "spending_hours": spending}
         )
         st.sidebar.success(f"Customer {len(st.session_state.customers)} added!")
 
@@ -38,7 +38,7 @@ n_clusters = st.sidebar.slider("Number of Clusters (K)", min_value=2, max_value=
 # ---------- Optional: CSV upload for bulk data ----------
 st.sidebar.markdown("---")
 st.sidebar.subheader("Ya CSV upload karo (bulk data)")
-uploaded_file = st.sidebar.file_uploader("CSV file with columns: Age, Annual_income, spending_hours", type=["csv"])
+uploaded_file = st.sidebar.file_uploader("CSV file with columns: Age, Money_Spent , spending_hours", type=["csv"])
 
 df = None
 if uploaded_file is not None:
@@ -59,7 +59,7 @@ with col1:
 
 # ---------- Run KMeans only if enough data ----------
 if df is not None and len(df) >= n_clusters:
-    X = df[["Age", "Annual_income", "spending_hours"]]
+    X = df[["Age", "Money_Spent ", "spending_hours"]]
     scaler = StandardScaler()
     x_scaled = scaler.fit_transform(X)
 
@@ -67,8 +67,8 @@ if df is not None and len(df) >= n_clusters:
     df["Cluster"] = kmeans.fit_predict(x_scaled)
 
     # Dynamically label clusters based on avg income + spending (not hardcoded!)
-    cluster_summary = df.groupby("Cluster")[["Annual_income", "spending_hours"]].mean()
-    cluster_summary["score"] = cluster_summary["Annual_income"] + cluster_summary["spending_hours"]
+    cluster_summary = df.groupby("Cluster")[["Money_Spent ", "spending_hours"]].mean()
+    cluster_summary["score"] = cluster_summary["Money_Spent "] + cluster_summary["spending_hours"]
     ranked = cluster_summary["score"].rank(ascending=True).astype(int)
 
     label_map = {}
@@ -87,7 +87,7 @@ if df is not None and len(df) >= n_clusters:
     with col2:
         st.subheader("📊 Cluster Visualization")
         fig, ax = plt.subplots(figsize=(7, 5))
-        scatter = ax.scatter(df["Age"], df["Annual_income"], c=df["Cluster"], cmap="viridis", s=80)
+        scatter = ax.scatter(df["Age"], df["Money_Spent "], c=df["Cluster"], cmap="viridis", s=80)
         ax.set_xlabel("Age")
         ax.set_ylabel("Annual Income")
         ax.set_title("Customer Segmentation (Age vs Income)")
@@ -115,7 +115,7 @@ if df is not None and len(df) >= n_clusters:
 
     if predict_btn:
         user_input = pd.DataFrame([[new_age, new_income, new_spending]],
-                                   columns=["Age", "Annual_income", "spending_hours"])
+                                   columns=["Age", "Money_Spent ", "spending_hours"])
         user_scaled = scaler.transform(user_input)
         pred_cluster = kmeans.predict(user_scaled)[0]
         pred_label = label_map[pred_cluster]
